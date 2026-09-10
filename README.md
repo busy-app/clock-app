@@ -77,7 +77,7 @@ dist/
     └── images/ animations/ sounds/ resources/
 ```
 
-`--tgz` packs that folder into `dist/app.busy.clock.tgz`, with the folder itself at the root of the archive.
+`--tgz` packs that folder into `dist/app.busy.clock-<version>.tgz`, with the folder itself at the root of the archive.
 
 ## Manifest
 
