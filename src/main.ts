@@ -16,7 +16,7 @@ import {
 } from "./time.ts";
 
 const APP = manifest.id;
-const ICON_FILE = "calendar.png";
+const ICON_FILE = "images/calendar.png";
 
 /** Calendar icon size. */
 const ICON = { width: 13, height: 14 };
