@@ -1,5 +1,5 @@
 import { device } from "@shared/device";
-import { column, render, row, stack, type Node } from "@shared/layout";
+import { column, render, row, stack, type Node } from "@busy-app/busy-lib";
 import manifest from "./appmeta/manifest.json";
 import { loadValues } from "@shared/settings";
 import {
