@@ -48,7 +48,7 @@ Anything in `src/` that isn't a source file is copied into the package. Files in
 
 A file whose extension disagrees with the folder it sits in is still placed by the folder, with a warning.
 
-Everything the app draws goes through the layout helpers in `@busy-app/busy-lib`: build a tree out of `row` / `column` / `stack`, hand it to `render()`, and send the result with `device.DisplayDraw()`. The screen is 72×16 pixels. The build itself comes from `@busy-app/cli`.
+Everything the app draws is a list of elements placed by hand in `src/frame.ts`, sent with `displayDraw()` from `@shared/device` — a plain `fetch` to `POST /api/display/draw`. The screen is 72×16 pixels; text is measured with the glyph widths in `src/font.ts`, which list only the characters the clock can produce. The build itself comes from `@busy-app/cli`.
 
 ## Commands
 
@@ -102,12 +102,12 @@ The app builds on Node 24 — the version in `.nvmrc` and the range `engines` al
 
 ## Settings
 
-To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values:
+To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values over the device API:
 
 ```ts
-import { loadValues } from "@shared/settings";
+import { getAppSettings } from "@shared/device";
 
-const values = await loadValues();
+const { version, values } = await getAppSettings(manifest.id);
 ```
 
-`loadValues()` returns `null` when nothing is stored yet — use the defaults.
+`values` is keyed by field id; the first request fills it from the schema defaults. The clock reads them once at startup, so a change takes effect when the app is restarted.
