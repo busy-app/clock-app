@@ -48,7 +48,7 @@ Anything in `src/` that isn't a source file is copied into the package. Files in
 
 A file whose extension disagrees with the folder it sits in is still placed by the folder, with a warning.
 
-Everything the app draws goes through the layout helpers in `@busy-app/busy-lib`: build a tree out of `row` / `column` / `stack`, hand it to `render()`, and send the result with `device.DisplayDraw()`. The screen is 72×16 pixels. The build itself comes from `@busy-app/cli`.
+Everything the app draws is a list of elements placed by hand in `src/frame.ts`, sent with `device.DisplayDraw()` from `@shared/device`. The screen is 72×16 pixels; text is measured with the glyph widths in `src/font.ts`, which list only the characters the clock can produce. The build itself comes from `@busy-app/cli`.
 
 ## Commands
 
