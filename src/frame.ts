@@ -81,7 +81,7 @@ function calendarIcon(now: Date, x: number): DisplayElement[] {
 export function frame(now: Date, settings: ClockSettings){
   const { time, suffix } = formatTimeParts(now, settings);
   const sub = settings.show_date || settings.show_weekday ? subtitle(now, settings) : "";
-  const showIcon = sub.length > 0 && !settings.show_date;
+  const showIcon = sub.length > 0;
 
   const timeWidth = textWidth(time, "bold") + (suffix ? SUFFIX_GAP + textWidth(suffix, "small") : 0);
   const width = Math.max(timeWidth, textWidth(sub, "small"));
