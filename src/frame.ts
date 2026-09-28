@@ -1,5 +1,3 @@
-// The frame, as DisplayDraw elements placed on the 72×16 front screen.
-
 import type { DisplayElement, TextElement } from "@shared/device";
 import { ASCENT, CAP_TOP, textWidth, type Font } from "./font.ts";
 import {
