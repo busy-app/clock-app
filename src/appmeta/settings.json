@@ -1,80 +1,59 @@
 {
   "format_version": 1,
   "version": 1,
-  "sections": [
-    {
-      "id": "time",
-      "label": "Time",
+  "fields": {
+    "time_format": {
+      "label": "Time Format",
       "description": "Clock format.",
-      "icon": "clock",
-      "fields": [
-        {
-          "id": "time_format",
-          "type": "enum",
-          "label": "Time Format",
-          "default": "24h",
-          "options": [
-            { "value": "24h", "label": "24-hour" },
-            { "value": "12h", "label": "12-hour" }
-          ]
-        },
-        {
-          "id": "show_seconds",
-          "type": "boolean",
-          "label": "Show seconds",
-          "default": true
-        },
-        {
-          "id": "blinking_colon",
-          "type": "boolean",
-          "label": "Colon blink",
-          "default": true
-        }
+      "type": "enum",
+      "default": "24h",
+      "options": [
+        { "value": "24h", "label": "24-hour" },
+        { "value": "12h", "label": "12-hour" }
       ]
     },
-    {
-      "id": "date",
-      "label": "Date",
+    "show_seconds": {
+      "label": "Show seconds",
+      "type": "boolean",
+      "default": true
+    },
+    "blinking_colon": {
+      "label": "Colon blink",
+      "type": "boolean",
+      "default": true
+    },
+    "show_date": {
+      "label": "Show date",
+      "type": "boolean",
+      "default": false
+    },
+    "date_format": {
+      "label": "Date Format",
       "description": "Date appearance.",
-      "icon": "calendar",
-      "fields": [
-        {
-          "id": "show_date",
-          "type": "boolean",
-          "label": "Show date",
-          "default": false
-        },
-        {
-          "id": "date_format",
-          "type": "enum",
-          "label": "Date Format",
-          "default": "DD.MM.YYYY",
-          "options": [
-            { "value": "DD.MM.YYYY", "label": "DD.MM.YYYY" },
-            { "value": "DD/MM/YYYY", "label": "DD/MM/YYYY" },
-            { "value": "MM/DD/YYYY", "label": "MM/DD/YYYY" },
-            { "value": "YYYY-MM-DD", "label": "YYYY-MM-DD" },
-            { "value": "DD-MM-YYYY", "label": "DD-MM-YYYY" },
-            { "value": "YYYY.MM.DD", "label": "YYYY.MM.DD" }
-          ]
-        },
-        {
-          "id": "year_digits",
-          "type": "enum",
-          "label": "Year Digits",
-          "default": "4",
-          "options": [
-            { "value": "4", "label": "4 digits (2026)" },
-            { "value": "2", "label": "2 digits (26)" }
-          ]
-        },
-        {
-          "id": "show_weekday",
-          "type": "boolean",
-          "label": "Show Weekday",
-          "default": true
-        }
+      "type": "enum",
+      "default": "DD.MM.YYYY",
+      "options": [
+        { "value": "DD.MM.YYYY", "label": "DD.MM.YYYY" },
+        { "value": "DD/MM/YYYY", "label": "DD/MM/YYYY" },
+        { "value": "MM/DD/YYYY", "label": "MM/DD/YYYY" },
+        { "value": "YYYY-MM-DD", "label": "YYYY-MM-DD" },
+        { "value": "DD-MM-YYYY", "label": "DD-MM-YYYY" },
+        { "value": "YYYY.MM.DD", "label": "YYYY.MM.DD" }
       ]
+    },
+    "year_digits": {
+      "label": "Year Digits",
+      "type": "enum",
+      "default": "4",
+      "options": [
+        { "value": "4", "label": "4 digits (2026)" },
+        { "value": "2", "label": "2 digits (26)" }
+      ]
+    },
+    "show_weekday": {
+      "label": "Show Weekday",
+      "type": "boolean",
+      "default": true
     }
-  ]
+  }
 }
