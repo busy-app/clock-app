@@ -1,7 +1,7 @@
 {
   "name": "clock",
   "private": true,
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Clock",
   "author": "Flipper FZCO",
   "type": "module",
