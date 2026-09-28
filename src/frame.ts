@@ -29,19 +29,16 @@ const WHITE = "#FFFFFFFF";
 const SUBTLE_WHITE = "#FFFFFF80";
 const BLACK = "#000000FF";
 
+const DAY_OFFSET = { dx: 1, dy: 7 };
+
 function text(id: string, value: string, font: Font, color: string, x: number, y: number): TextElement {
   return { type: "text", id, text: value, font, color, x, y, display: "front" };
 }
 
-/** Offset that centers `size` in `space`; what doesn't fit starts at 0. */
 function center(size: number, space: number) {
   return Math.max(0, Math.floor((space - size) / 2));
 }
 
-/**
- * The bottom line, per settings:
- *   "29.07.2026, Tue" | "Sep, Tue" | "29.07.2026" | "Sep"
- */
 function subtitle(now: Date, settings: ClockSettings) {
   const parts: string[] = [];
 
@@ -53,10 +50,6 @@ function subtitle(now: Date, settings: ClockSettings) {
   return parts.join(", ");
 }
 
-/**
- * The time, followed by AM/PM in 12-hour format. Split into segments, each with its own color, and keyed by segment index.
- * `y` is the digits' element y.
- */
 function timeLine(time: string, suffix: string, dim: boolean, x: number, y: number): TextElement[] {
   const line: TextElement[] = [];
 
@@ -73,10 +66,6 @@ function timeLine(time: string, suffix: string, dim: boolean, x: number, y: numb
   return line;
 }
 
-/**
- * Calendar icon with the day inside, centered horizontally and dropped into the white field below the icon's header.
- */
-const DAY_OFFSET = { dx: 1, dy: 7 };
 
 function calendarIcon(now: Date, x: number): DisplayElement[] {
   const y = center(ICON.height, SCREEN.height);
@@ -89,10 +78,6 @@ function calendarIcon(now: Date, x: number): DisplayElement[] {
   ];
 }
 
-/**
- * The whole frame, centered as one block. The icon shows only when the full date is off.
- * Every line starts with a digit or a capital, so each one's ink starts CAP_TOP below its element y.
- */
 export function frame(now: Date, settings: ClockSettings){
   const { time, suffix } = formatTimeParts(now, settings);
   const sub = settings.show_date || settings.show_weekday ? subtitle(now, settings) : "";

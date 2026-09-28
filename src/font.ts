@@ -34,9 +34,9 @@ export function textWidth(text: string, font: Font) {
     if (advance === undefined) {
       throw new Error(`no metrics for "${ch}" in font ${font}`);
     }
-    
+
     width += advance;
   }
-  
+
   return width;
 }
