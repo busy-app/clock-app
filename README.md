@@ -48,7 +48,7 @@ Anything in `src/` that isn't a source file is copied into the package. Files in
 
 A file whose extension disagrees with the folder it sits in is still placed by the folder, with a warning.
 
-Everything the app draws is a list of elements placed by hand in `src/frame.ts`, sent with `device.DisplayDraw()` from `@shared/device`. The screen is 72×16 pixels; text is measured with the glyph widths in `src/font.ts`, which list only the characters the clock can produce. The build itself comes from `@busy-app/cli`.
+Everything the app draws is placed in `src/frame.ts` and sent with `displayDraw()` from `@shared/device`. Text widths come from `src/font.ts` — it only has the characters this clock prints. The build itself comes from `@busy-app/cli`.
 
 ## Commands
 
@@ -102,7 +102,7 @@ The app builds on Node 24 — the version in `.nvmrc` and the range `engines` al
 
 ## Settings
 
-To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values over the device API:
+To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values with `getAppSettings()`:
 
 ```ts
 import { getAppSettings } from "@shared/device";
@@ -110,4 +110,4 @@ import { getAppSettings } from "@shared/device";
 const { version, values } = await getAppSettings(manifest.id);
 ```
 
-`values` is keyed by field id; the first request fills it from the schema defaults. The clock reads them once at startup, so a change takes effect when the app is restarted.
+`values` is a map of field id to the stored value. If nothing is stored yet, the first read fills in the defaults from the schema. The clock reads settings once, at startup — restart it to pick up a change.
