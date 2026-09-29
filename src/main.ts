@@ -5,6 +5,8 @@ import { DEFAULTS, normalizeSettings, type ClockSettings } from "./time.ts";
 
 const APP = manifest.id;
 
+const REDRAW_INTERVAL_MS = 1000;
+
 let settings: ClockSettings = DEFAULTS;
 let drawing = false;
 
@@ -37,5 +39,5 @@ export default function run() {
     draw()
       .catch(report)
       .finally(() => (drawing = false));
-  }, 1000);
+  }, REDRAW_INTERVAL_MS);
 }
