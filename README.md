@@ -48,7 +48,7 @@ Anything in `src/` that isn't a source file is copied into the package. Files in
 
 A file whose extension disagrees with the folder it sits in is still placed by the folder, with a warning.
 
-Everything the app draws goes through the layout helpers in `@busy-app/busy-lib`: build a tree out of `row` / `column` / `stack`, hand it to `render()`, and send the result with `device.DisplayDraw()`. The screen is 72×16 pixels. The build itself comes from `@busy-app/cli`.
+Everything the app draws is placed in `src/frame.ts` and sent with `displayDraw()` from `@shared/device`. Text widths come from `src/font.ts` — it only has the characters this clock prints. The build itself comes from `@busy-app/cli`.
 
 ## Commands
 
@@ -102,12 +102,12 @@ The app builds on Node 24 — the version in `.nvmrc` and the range `engines` al
 
 ## Settings
 
-To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values:
+To give the app a settings screen, add `src/appmeta/settings.json` describing the fields, then read the stored values with `getAppSettings()`:
 
 ```ts
-import { loadValues } from "@shared/settings";
+import { getAppSettings } from "@shared/device";
 
-const values = await loadValues();
+const { version, values } = await getAppSettings(manifest.id);
 ```
 
-`loadValues()` returns `null` when nothing is stored yet — use the defaults.
+`values` is a map of field id to the stored value. If nothing is stored yet, the first read fills in the defaults from the schema. The clock reads settings once, at startup — restart it to pick up a change.
