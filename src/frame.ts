@@ -2,7 +2,6 @@ import type { DisplayElement, TextElement } from "@shared/device";
 import { ASCENT, CAP_TOP, textWidth, type Font } from "./font.ts";
 import {
   colonDimmed,
-  formatDate,
   formatDayOfMonth,
   formatMonth,
   formatTimeParts,
@@ -39,15 +38,8 @@ function center(size: number, space: number) {
   return Math.max(0, Math.floor((space - size) / 2));
 }
 
-function subtitle(now: Date, settings: ClockSettings) {
-  const parts: string[] = [];
-
-  if (settings.show_date) parts.push(formatDate(now, settings));
-  else parts.push(formatMonth(now));
-
-  if (settings.show_weekday) parts.push(formatWeekday(now));
-
-  return parts.join(", ");
+function subtitle(now: Date) {
+  return `${formatMonth(now)}, ${formatWeekday(now)}`;
 }
 
 function timeLine(time: string, suffix: string, dim: boolean, x: number, y: number): TextElement[] {
@@ -80,11 +72,12 @@ function calendarIcon(now: Date, x: number): DisplayElement[] {
 
 export function frame(now: Date, settings: ClockSettings){
   const { time, suffix } = formatTimeParts(now, settings);
-  const sub = settings.show_date || settings.show_weekday ? subtitle(now, settings) : "";
-  const showIcon = sub.length > 0;
+  const sub = settings.show_date ? subtitle(now) : "";
+  const showIcon = settings.show_date;
 
   const timeWidth = textWidth(time, "bold") + (suffix ? SUFFIX_GAP + textWidth(suffix, "small") : 0);
-  const width = Math.max(timeWidth, textWidth(sub, "small"));
+  const subWidth = textWidth(sub, "small");
+  const width = Math.max(timeWidth, subWidth);
   const height = sub ? TIME_HEIGHT + LINE_GAP + SUB_HEIGHT : TIME_HEIGHT;
 
   const iconSpace = showIcon ? ICON.width + ICON_GAP : 0;
@@ -93,11 +86,24 @@ export function frame(now: Date, settings: ClockSettings){
   const top = center(height, SCREEN.height);
 
   const elements: DisplayElement[] = showIcon ? calendarIcon(now, left) : [];
-  elements.push(...timeLine(time, suffix, colonDimmed(now, settings), x, top - CAP_TOP));
-  
+
+  // Both lines sit centred in the block, or the shorter one hangs off to the left.
+  elements.push(
+    ...timeLine(time, suffix, colonDimmed(now, settings), x + center(timeWidth, width), top - CAP_TOP),
+  );
+
   if (sub) {
-    elements.push(text("sub", sub, "small", SUBTLE_WHITE, x, top + TIME_HEIGHT + LINE_GAP - CAP_TOP));
+    elements.push(
+      text(
+        "sub",
+        sub,
+        "small",
+        SUBTLE_WHITE,
+        x + center(subWidth, width),
+        top + TIME_HEIGHT + LINE_GAP - CAP_TOP,
+      ),
+    );
   }
-  
+
   return elements;
 }

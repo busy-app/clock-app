@@ -1,26 +1,20 @@
 // Time and date formatting, per appmeta/settings.json.
 
 
-/** Values of the `time`/`date` settings fields. */
+/** Values of the settings fields. */
 export interface ClockSettings {
   time_format: "24h" | "12h";
-  show_seconds: boolean;
-  blinking_colon: boolean;
   show_date: boolean;
-  date_format: "DD.MM.YYYY" | "DD/MM/YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD" | "DD-MM-YYYY" | "YYYY.MM.DD";
-  year_digits: "2" | "4";
-  show_weekday: boolean;
+  show_seconds: boolean;
+  blink_colons: boolean;
 }
 
 /** Defaults, matching appmeta/settings.json. */
 export const DEFAULTS: ClockSettings = {
   time_format: "24h",
-  show_seconds: true,
-  blinking_colon: true,
-  show_date: false,
-  date_format: "DD.MM.YYYY",
-  year_digits: "4",
-  show_weekday: true,
+  show_date: true,
+  show_seconds: false,
+  blink_colons: true,
 };
 
 const MONTHS = [
@@ -29,7 +23,6 @@ const MONTHS = [
 ];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// 12-hour format suffixes.
 const SUFFIXES = ["AM", "PM"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -72,36 +65,7 @@ export function splitTime(time: string): TimeSegment[] {
 
 /** Whether the colons are in their dimmed blink phase. */
 export function colonDimmed(d: Date, s: ClockSettings = DEFAULTS): boolean {
-  return s.blinking_colon && d.getSeconds() % 2 === 1;
-}
-
-/** The time as one string, e.g. "14:05" or "2:05 PM". */
-export function formatTime(d: Date, s: ClockSettings = DEFAULTS): string {
-  const { time, suffix } = formatTimeParts(d, s);
-  return suffix ? `${time} ${suffix}` : time;
-}
-
-/** The date in the selected pattern; YYYY marks position, not length. */
-export function formatDate(d: Date, s: ClockSettings = DEFAULTS): string {
-  const DD = pad(d.getDate());
-  const MM = pad(d.getMonth() + 1);
-  const year = d.getFullYear();
-  const YYYY = s.year_digits === "2" ? pad(year % 100) : String(year);
-
-  switch (s.date_format) {
-    case "DD/MM/YYYY":
-      return `${DD}/${MM}/${YYYY}`;
-    case "MM/DD/YYYY":
-      return `${MM}/${DD}/${YYYY}`;
-    case "YYYY-MM-DD":
-      return `${YYYY}-${MM}-${DD}`;
-    case "DD-MM-YYYY":
-      return `${DD}-${MM}-${YYYY}`;
-    case "YYYY.MM.DD":
-      return `${YYYY}.${MM}.${DD}`;
-    default:
-      return `${DD}.${MM}.${YYYY}`;
-  }
+  return s.blink_colons && d.getSeconds() % 2 === 1;
 }
 
 /** Three-letter month, e.g. "Jul". */
@@ -131,18 +95,8 @@ export function normalizeSettings(raw: Record<string, unknown> | null | undefine
 
   return {
     time_format: pick("time_format", ["24h", "12h"]),
-    show_seconds: pick("show_seconds"),
-    blinking_colon: pick("blinking_colon"),
     show_date: pick("show_date"),
-    date_format: pick("date_format", [
-      "DD.MM.YYYY",
-      "DD/MM/YYYY",
-      "MM/DD/YYYY",
-      "YYYY-MM-DD",
-      "DD-MM-YYYY",
-      "YYYY.MM.DD",
-    ]),
-    year_digits: pick("year_digits", ["2", "4"]),
-    show_weekday: pick("show_weekday"),
+    show_seconds: pick("show_seconds"),
+    blink_colons: pick("blink_colons"),
   };
 }
