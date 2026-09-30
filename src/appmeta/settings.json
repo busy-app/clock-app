@@ -12,46 +12,18 @@
         { "value": "12h", "label": "12-hour" }
       ]
     },
-    "show_seconds": {
-      "label": "Show seconds",
-      "type": "boolean",
-      "default": true
-    },
-    "blinking_colon": {
-      "label": "Colon blink",
-      "type": "boolean",
-      "default": true
-    },
     "show_date": {
       "label": "Show date",
       "type": "boolean",
+      "default": true
+    },
+    "show_seconds": {
+      "label": "Show seconds",
+      "type": "boolean",
       "default": false
     },
-    "date_format": {
-      "label": "Date Format",
-      "description": "Date appearance.",
-      "type": "enum",
-      "default": "DD.MM.YYYY",
-      "options": [
-        { "value": "DD.MM.YYYY", "label": "DD.MM.YYYY" },
-        { "value": "DD/MM/YYYY", "label": "DD/MM/YYYY" },
-        { "value": "MM/DD/YYYY", "label": "MM/DD/YYYY" },
-        { "value": "YYYY-MM-DD", "label": "YYYY-MM-DD" },
-        { "value": "DD-MM-YYYY", "label": "DD-MM-YYYY" },
-        { "value": "YYYY.MM.DD", "label": "YYYY.MM.DD" }
-      ]
-    },
-    "year_digits": {
-      "label": "Year Digits",
-      "type": "enum",
-      "default": "4",
-      "options": [
-        { "value": "4", "label": "4 digits (2026)" },
-        { "value": "2", "label": "2 digits (26)" }
-      ]
-    },
-    "show_weekday": {
-      "label": "Show Weekday",
+    "blink_colons": {
+      "label": "Blink colons",
       "type": "boolean",
       "default": true
     }

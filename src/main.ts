@@ -8,7 +8,6 @@ const APP = manifest.id;
 const REDRAW_INTERVAL_MS = 1000;
 
 let settings: ClockSettings = DEFAULTS;
-let drawing = false;
 
 function report(err: unknown) {
   console.error(`${APP}: ${err instanceof Error ? err.message : String(err)}`);
@@ -22,15 +21,26 @@ async function loadSettings() {
   }
 }
 
-async function draw() {
-  await displayDraw({ application_name: APP, priority: 50, elements: frame(new Date(), settings) });
-}
-
 export default function run() {
-  loadSettings().then(draw).catch(report);
+  let stopped = false;
+  let drawing = false;
+  let shownFrame = "";
 
-  setInterval(() => {
-    if (drawing) {
+  async function draw() {
+    const elements = frame(new Date(), settings);
+    const next = JSON.stringify(elements);
+
+    // Without seconds and blinking colons the frame only changes once a minute
+    if (next === shownFrame) {
+      return;
+    }
+
+    await displayDraw({ application_name: APP, priority: 50, elements });
+    shownFrame = next;
+  }
+
+  const redrawTimer = setInterval(() => {
+    if (stopped || drawing) {
       return;
     }
 
@@ -40,4 +50,23 @@ export default function run() {
       .catch(report)
       .finally(() => (drawing = false));
   }, REDRAW_INTERVAL_MS);
+
+  const unbind = listen("input", (event) => {
+    if (stopped || event.key !== "back" || event.action !== "press") {
+      return;
+    }
+
+    stopped = true;
+    clearInterval(redrawTimer);
+
+    setTimeout(unbind, 10);
+  });
+
+  loadSettings()
+    .then(() => {
+      if (!stopped) {
+        return draw();
+      }
+    })
+    .catch(report);
 }
