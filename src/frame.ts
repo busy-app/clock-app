@@ -25,8 +25,9 @@ const TIME_HEIGHT = ASCENT.bold - CAP_TOP;
 const SUB_HEIGHT = ASCENT.small - CAP_TOP;
 
 const WHITE = "#FFFFFFFF";
-const SUBTLE_WHITE = "#FFFFFF80";
-const BLACK = "#000000FF";
+const DIMMED_WHITE = "#FFFFFF7F";
+const BLINKED_WHITE = "#FFFFFF66";
+const DAY_COLOR = "#323232FF";
 
 const DAY_OFFSET = { dx: 1, dy: 7 };
 
@@ -47,7 +48,7 @@ function timeLine(time: string, suffix: string, dim: boolean, x: number, y: numb
 
   splitTime(time).forEach((segment, i) => {
     const id = segment.colon ? `colon${i}` : `time${i}`;
-    line.push(text(id, segment.text, "bold", segment.colon && dim ? SUBTLE_WHITE : WHITE, x, y));
+    line.push(text(id, segment.text, "bold", segment.colon && dim ? BLINKED_WHITE : WHITE, x, y));
     x += textWidth(segment.text, "bold");
   });
 
@@ -66,7 +67,7 @@ function calendarIcon(now: Date, x: number): DisplayElement[] {
 
   return [
     { type: "image", id: "icon", path: ICON_FILE, x, y, display: "front" },
-    text("day", day, "superscript", BLACK, dayX, y + DAY_OFFSET.dy - CAP_TOP),
+    text("day", day, "superscript", DAY_COLOR, dayX, y + DAY_OFFSET.dy - CAP_TOP),
   ];
 }
 
@@ -87,21 +88,10 @@ export function frame(now: Date, settings: ClockSettings){
 
   const elements: DisplayElement[] = showIcon ? calendarIcon(now, left) : [];
 
-  elements.push(
-    ...timeLine(time, suffix, colonDimmed(now, settings), x + center(timeWidth, width), top - CAP_TOP),
-  );
+  elements.push(...timeLine(time, suffix, colonDimmed(now, settings), x, top - CAP_TOP));
 
   if (sub) {
-    elements.push(
-      text(
-        "sub",
-        sub,
-        "small",
-        SUBTLE_WHITE,
-        x + center(subWidth, width),
-        top + TIME_HEIGHT + LINE_GAP - CAP_TOP,
-      ),
-    );
+    elements.push(text("sub", sub, "small", DIMMED_WHITE, x, top + TIME_HEIGHT + LINE_GAP - CAP_TOP));
   }
 
   return elements;
