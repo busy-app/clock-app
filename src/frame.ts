@@ -87,7 +87,6 @@ export function frame(now: Date, settings: ClockSettings){
 
   const elements: DisplayElement[] = showIcon ? calendarIcon(now, left) : [];
 
-  // Both lines sit centred in the block, or the shorter one hangs off to the left.
   elements.push(
     ...timeLine(time, suffix, colonDimmed(now, settings), x + center(timeWidth, width), top - CAP_TOP),
   );

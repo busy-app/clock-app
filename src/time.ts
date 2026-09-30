@@ -1,7 +1,6 @@
 // Time and date formatting, per appmeta/settings.json.
 
 
-/** Values of the settings fields. */
 export interface ClockSettings {
   time_format: "24h" | "12h";
   show_date: boolean;
