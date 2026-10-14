@@ -2,7 +2,8 @@
   "format_version": 1,
   "id": "app.busy.clock",
   "name": "Clock",
-  "version": "0.5.1",
+  "version": "0.5.2",
+  "api_version": "27.9.0",
   "description": "Clock",
   "author": "Flipper FZCO"
 }
