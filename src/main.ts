@@ -21,7 +21,10 @@ async function loadSettings() {
   }
 }
 
-export default function run() {
+/**
+ * Entry point, called at the end of the file: the device runs this script from top to bottom and starts nothing by itself.
+ */
+function main(): void {
   let stopped = false;
   let drawing = false;
   let shownFrame = "";
@@ -70,3 +73,5 @@ export default function run() {
     })
     .catch(report);
 }
+
+main();
