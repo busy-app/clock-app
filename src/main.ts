@@ -55,7 +55,7 @@ function main(): void {
   }, REDRAW_INTERVAL_MS);
 
   const unbind = listen("input", (event) => {
-    if (stopped || event.key !== "back" || event.action !== "press") {
+    if (stopped || event.key !== "back" || event.action !== "short") {
       return;
     }
 
