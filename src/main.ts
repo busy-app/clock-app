@@ -1,13 +1,13 @@
-import { displayDraw, getAppSettings } from "@shared/device";
-import manifest from "./appmeta/manifest.json";
+import { appsSettingsGet, BusyBarAppClient, displayDraw } from "@busy-app/busy-lib";
+import { id as APP } from "./appmeta/manifest.json";
 import { frame } from "./frame.ts";
-import { DEFAULTS, normalizeSettings, type ClockSettings } from "./time.ts";
-
-const APP = manifest.id;
+import { DEFAULTS, type ClockSettings } from "./settings.ts";
 
 const REDRAW_INTERVAL_MS = 1000;
 
-let settings: ClockSettings = DEFAULTS;
+const client = new BusyBarAppClient({ addr: __BUSY_ADDR__ });
+
+let settings = DEFAULTS;
 
 function report(err: unknown) {
   console.error(`${APP}: ${err instanceof Error ? err.message : String(err)}`);
@@ -15,7 +15,8 @@ function report(err: unknown) {
 
 async function loadSettings() {
   try {
-    settings = normalizeSettings((await getAppSettings(APP)).values);
+    const { values } = await appsSettingsGet(client, { app_id: APP });
+    settings = { ...DEFAULTS, ...(values as Partial<ClockSettings>) };
   } catch (err) {
     report(err);
   }
@@ -24,35 +25,39 @@ async function loadSettings() {
 /**
  * Entry point, called at the end of the file: the device runs this script from top to bottom and starts nothing by itself.
  */
-function main(): void {
+function main() {
   let stopped = false;
   let drawing = false;
   let shownFrame = "";
 
   async function draw() {
-    const elements = frame(new Date(), settings);
-    const next = JSON.stringify(elements);
-
-    // Without seconds and blinking colons the frame only changes once a minute
-    if (next === shownFrame) {
-      return;
-    }
-
-    await displayDraw({ application_name: APP, priority: 50, elements });
-    shownFrame = next;
-  }
-
-  const redrawTimer = setInterval(() => {
     if (stopped || drawing) {
       return;
     }
 
     drawing = true;
 
-    draw()
-      .catch(report)
-      .finally(() => (drawing = false));
-  }, REDRAW_INTERVAL_MS);
+    try {
+      const elements = frame(new Date(), settings);
+      const next = JSON.stringify(elements);
+
+      if (next !== shownFrame) {
+        await displayDraw(client, { application_name: APP, elements });
+        shownFrame = next;
+      }
+    } catch (err) {
+      report(err);
+    } finally {
+      drawing = false;
+    }
+  }
+
+  async function start() {
+    await loadSettings();
+    await draw();
+  }
+
+  const redrawTimer = setInterval(draw, REDRAW_INTERVAL_MS);
 
   const unbind = listen("input", (event) => {
     if (stopped || event.key !== "back" || event.action !== "short") {
@@ -65,13 +70,7 @@ function main(): void {
     setTimeout(unbind, 10);
   });
 
-  loadSettings()
-    .then(() => {
-      if (!stopped) {
-        return draw();
-      }
-    })
-    .catch(report);
+  start();
 }
 
 main();

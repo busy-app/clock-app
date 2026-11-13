@@ -1,28 +1,21 @@
-import type { DisplayElement, TextElement } from "@shared/device";
-import { ASCENT, CAP_TOP, textWidth, type Font } from "./font.ts";
 import {
-  colonDimmed,
+  column,
   formatDayOfMonth,
   formatMonth,
-  formatTimeParts,
+  formatTime,
   formatWeekday,
-  splitTime,
-  type ClockSettings,
-} from "./time.ts";
+  render,
+  row,
+  stack,
+  type TextNode,
+} from "@busy-app/busy-lib";
+import type { ClockSettings } from "./settings.ts";
 
-const SCREEN = { width: 72, height: 16 };
-
-const ICON_FILE = "images/calendar.png";
-
-const ICON = { width: 13, height: 14 };
+const ICON = { path: "images/calendar.png", width: 13, height: 14 };
 
 const SUFFIX_GAP = 1;
 const ICON_GAP = 2;
 const LINE_GAP = 2;
-
-/** Line heights, from the top of the digits and capitals down to the baseline. */
-const TIME_HEIGHT = ASCENT.bold - CAP_TOP;
-const SUB_HEIGHT = ASCENT.small - CAP_TOP;
 
 const WHITE = "#FFFFFFFF";
 const DIMMED_WHITE = "#FFFFFF7F";
@@ -31,68 +24,49 @@ const DAY_COLOR = "#323232FF";
 
 const DAY_OFFSET = { dx: 1, dy: 7 };
 
-function text(id: string, value: string, font: Font, color: string, x: number, y: number): TextElement {
-  return { type: "text", id, text: value, font, color, x, y, display: "front" };
-}
-
-function center(size: number, space: number) {
-  return Math.max(0, Math.floor((space - size) / 2));
-}
-
-function subtitle(now: Date) {
-  return `${formatMonth(now)}, ${formatWeekday(now)}`;
-}
-
-function timeLine(time: string, suffix: string, dim: boolean, x: number, y: number): TextElement[] {
-  const line: TextElement[] = [];
-
-  splitTime(time).forEach((segment, i) => {
-    const id = segment.colon ? `colon${i}` : `time${i}`;
-    line.push(text(id, segment.text, "bold", segment.colon && dim ? BLINKED_WHITE : WHITE, x, y));
-    x += textWidth(segment.text, "bold");
+function timeLine(now: Date, settings: ClockSettings) {
+  const { time, suffix } = formatTime(now, {
+    hour12: settings.time_format === "12h",
+    seconds: settings.show_seconds,
   });
+  const colonColor = settings.blink_colons && now.getSeconds() % 2 === 1 ? BLINKED_WHITE : WHITE;
 
-  if (suffix) {
-    line.push(text("suffix", suffix, "small", WHITE, x + SUFFIX_GAP, y + ASCENT.bold - ASCENT.small));
+  const segments: TextNode[] = [];
+  for (const digits of time.split(":")) {
+    if (segments.length > 0) {
+      segments.push({ type: "text", id: `colon${segments.length}`, text: ":", font: "bold", color: colonColor });
+    }
+
+    segments.push({ type: "text", id: `time${segments.length}`, text: digits, font: "bold", color: WHITE });
   }
 
-  return line;
-}
+  const digits = row({}, segments);
 
-
-function calendarIcon(now: Date, x: number): DisplayElement[] {
-  const y = center(ICON.height, SCREEN.height);
-  const day = formatDayOfMonth(now);
-  const dayX = x + center(textWidth(day, "superscript"), ICON.width) + DAY_OFFSET.dx;
-
-  return [
-    { type: "image", id: "icon", path: ICON_FILE, x, y, display: "front" },
-    text("day", day, "superscript", DAY_COLOR, dayX, y + DAY_OFFSET.dy - CAP_TOP),
-  ];
-}
-
-export function frame(now: Date, settings: ClockSettings){
-  const { time, suffix } = formatTimeParts(now, settings);
-  const sub = settings.show_date ? subtitle(now) : "";
-  const showIcon = settings.show_date;
-
-  const timeWidth = textWidth(time, "bold") + (suffix ? SUFFIX_GAP + textWidth(suffix, "small") : 0);
-  const subWidth = textWidth(sub, "small");
-  const width = Math.max(timeWidth, subWidth);
-  const height = sub ? TIME_HEIGHT + LINE_GAP + SUB_HEIGHT : TIME_HEIGHT;
-
-  const iconSpace = showIcon ? ICON.width + ICON_GAP : 0;
-  const left = center(iconSpace + width, SCREEN.width);
-  const x = left + iconSpace;
-  const top = center(height, SCREEN.height);
-
-  const elements: DisplayElement[] = showIcon ? calendarIcon(now, left) : [];
-
-  elements.push(...timeLine(time, suffix, colonDimmed(now, settings), x, top - CAP_TOP));
-
-  if (sub) {
-    elements.push(text("sub", sub, "small", DIMMED_WHITE, x, top + TIME_HEIGHT + LINE_GAP - CAP_TOP));
+  if (!suffix) {
+    return digits;
   }
 
-  return elements;
+  return row({ gap: SUFFIX_GAP }, [
+    digits,
+    { type: "text", id: "suffix", text: suffix, font: "small", color: WHITE },
+  ]);
+}
+
+function calendarIcon(now: Date) {
+  return stack({ justify: "center" }, [
+    { type: "image", id: "icon", ...ICON },
+    { type: "text", id: "day", text: formatDayOfMonth(now), font: "superscript", color: DAY_COLOR, ...DAY_OFFSET },
+  ]);
+}
+
+function dateLine(now: Date): TextNode {
+  return { type: "text", id: "sub", text: `${formatMonth(now)}, ${formatWeekday(now)}`, font: "small", color: DIMMED_WHITE };
+}
+
+export function frame(now: Date, settings: ClockSettings) {
+  const content = settings.show_date
+    ? [calendarIcon(now), column({ gap: LINE_GAP }, [timeLine(now, settings), dateLine(now)])]
+    : [timeLine(now, settings)];
+
+  return render(row({ gap: ICON_GAP, justify: "center", align: "center" }, content));
 }
